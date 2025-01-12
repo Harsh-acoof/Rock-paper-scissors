@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+            height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        h1 {
+            color: #5c6bc0;
+        }
+        .game-buttons {
+            margin-top: 20px;
+        }
+        .game-buttons a {
+            font-size: 20px;
+            text-decoration: none;
+            padding: 15px 30px;
+            margin: 10px;
+            border: 2px solid #5c6bc0;
+            border-radius: 5px;
+            color: #5c6bc0;
+            background-color: #e8eaf6;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .game-buttons a:hover {
+            background-color: #5c6bc0;
+            color: #fff;
+            transform: scale(1.1);
+        }
+        hr {
+            margin: 20px 0;
+            border: 1px solid #ddd;
+        }
+        .result {
+            font-size: 20px;
+            margin-top: 15px;
+            font-style: italic;
+        }
+        .scoreboard {
+            font-size: 18px;
+            margin-top: 20px;
+        }
+        .scoreboard span {
+            display: inline-block;
+            width: 120px;
+            padding: 5px;
+            margin: 0 10px;
+            font-weight: bold;
+        }
+        .clear-button {
+            font-size: 16px;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 2px solid #ff4081;
+            border-radius: 5px;
+            background-color: #ffebee;
+            color: #ff4081;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .clear-button:hover {
+            background-color: #ff4081;
+            color: #fff;
+            transform: scale(1.1);
+        }
+        footer {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Rock Paper Scissors Game</h1>
+    <p>Choose your option:</p>
+
+    <div class="game-buttons">
+        <a href="#" onClick="playRPS(1)">Rock</a>
+        <a href="#" onClick="playRPS(2)">Paper</a>
+        <a href="#" onClick="playRPS(3)">Scissors</a>
+    </div>
+
+    <hr>
+
+    <div class="result" id="result"></div>
+
+    <div class="scoreboard">
+        <span id="wins">Wins: 0</span>
+        <span id="losses">Losses: 0</span>
+        <span id="ties">Ties: 0</span>
+    </div>
+
+    <footer>
+        <a href="#" onClick="playRPS(4)" class="clear-button">Clear Scores</a>
+    </footer>
+
+    <script>
+        playRPS = async function(value) {
+            let a = [1, 2, 3];  // 1=Rock, 2=Paper, 3=Scissors
+            let i = Math.floor(Math.random() * a.length);
+            let r = a[i]; // Random choice for the computer
+
+            let url, result;
+
+            if (value == 4) {
+                // Clear scores
+                url = "http://localhost:8080/score/clear";
+                result = "Scores cleared";
+                console.log('Clear scores');
+            } else if (value > r) {
+                // Win case
+                url = "http://localhost:8080/score/wins";
+                result = "You Win!";
+                console.log('Player choice: ' + value + ', Computer choice: ' + r);
+            } else if (value < r) {
+                // Loss case
+                url = "http://localhost:8080/score/losses";
+                result = "You Lose!";
+                console.log('Player choice: ' + value + ', Computer choice: ' + r);
+            } else {
+                // Tie case
+                url = "http://localhost:8080/score/ties";
+                result = "It's a Tie!";
+                console.log('Player choice: ' + value + ', Computer choice: ' + r);
+            }
+
+            try {
+                const response = await fetch(url, { method: "POST" });
+                const thescore = await response.json();
+
+                document.getElementById("wins").innerHTML = "<b>Wins:</b> " + thescore.wins;
+                document.getElementById("losses").innerHTML = "<b>Losses:</b> " + thescore.losses;
+                document.getElementById("ties").innerHTML = "<b>Ties:</b> " + thescore.ties;
+            } catch (error) {
+                console.log(error.message);
+            }
+
+            document.getElementById("result").innerHTML = result;
+        };
+    </script>
+
+</body>
+</html>
